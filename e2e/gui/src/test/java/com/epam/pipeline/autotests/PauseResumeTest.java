@@ -167,16 +167,29 @@ public class PauseResumeTest extends AbstractSeveralPipelineRunningTest implemen
                         .saveIfNeeded());
 
         tools()
-                .perform(registry, group, tool, ToolTab::runWithCustomSettings)
-                .setLaunchOptions("15", instanceType, null)
-                .setPriceType(priceType)
-                .click(START_IDLE)
-                .launchTool(this, Utils.nameWithoutGroup(tool))
+                .perform(registry, group, tool, tool -> tool
+                        .versions()
+                        .viewUnscannedVersions()
+                        .selectVersion(toolNameTag)
+                        .versionSettings()
+                        .setDisk("15")
+                        .setInstanceType(instanceType)
+                        .setPriceType(priceType)
+                        .setDefaultCommand("sleep infinity")
+                        .saveIfNeeded());
+
+        tools()
+                .perform(registry, group, tool, defaultTool ->
+                        defaultTool.versions()
+                                .viewUnscannedVersions()
+                                .runVersionWithDefaultSettings(this, nameWithoutGroup(tool), toolNameTag)
+                )
                 .log(getLastRunId(), log ->
                         log.waitForSshLink()
                                 .inAnotherTab(logTab -> logTab
                                         .ssh(shell -> shell
-                                                .execute("fallocate -l 25G test.big")
+                                                .execute("head -c 25GB /dev/urandom > test.big")
+                                                .waitUntilTextAppearsSeveralTimes(getLastRunId(), 2)
                                                 .sleep(30, SECONDS))
                                 )
                                 .waitForPauseButton()
@@ -186,12 +199,14 @@ public class PauseResumeTest extends AbstractSeveralPipelineRunningTest implemen
                                 .assertPausingStatus()
                                 .ensure(taskWithName(pauseTask), visible)
                                 .click(taskWithName(pauseTask))
-                                .ensure(log(), matchText("\\[WARN] Free disk space 0Kb is not enough for committing.*"))
+                                .ensure(log(), matchText(
+                                        "\\[WARN] Free disk space [0-9\\.]+Kb is not enough for committing.*"))
                                 .waitForPauseButton()
                                 .shouldHaveStatus(LogAO.Status.WORKING)
                                 .inAnotherTab(logTab -> logTab
                                         .ssh(shell -> shell
-                                                .execute("rm test.big && fallocate -l 10G test2.big")
+                                                .execute("rm test.big && head -c 10GB /dev/urandom > test2.big")
+                                                .waitUntilTextAppearsSeveralTimes(getLastRunId(), 2)
                                                 .sleep(30, SECONDS))
                                 )
                                 .waitForPauseButton()
@@ -200,7 +215,8 @@ public class PauseResumeTest extends AbstractSeveralPipelineRunningTest implemen
                                 .assertPausingStatus()
                                 .ensure(taskWithName(pauseTask), visible)
                                 .click(taskWithName(pauseTask))
-                                .ensure(log(), matchText("\\[WARN] Free disk space [0-9\\.]+Kb is not enough for committing.*"))
+                                .ensure(log(), matchText(
+                                        "\\[WARN] Free disk space [0-9\\.]+Kb is not enough for committing.*"))
                                 .waitForPauseButton()
                                 .shouldHaveStatus(LogAO.Status.WORKING)
                 );
@@ -249,7 +265,7 @@ public class PauseResumeTest extends AbstractSeveralPipelineRunningTest implemen
                         .setInstanceType(instanceType)
                         .setPriceType(priceType)
                         .setDefaultCommand("sleep infinity")
-                        .save());
+                        .saveIfNeeded());
         tools()
                 .perform(registry, group, tool, defaultTool ->
                         defaultTool.versions()
