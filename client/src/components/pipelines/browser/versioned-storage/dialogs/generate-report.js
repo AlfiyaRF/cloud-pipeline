@@ -36,10 +36,6 @@ import styles from './generate-report.css';
 const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 const ID_COMPONENT = 'report';
 
-const REPORT_FORMATS = {
-  docx: 'docx',
-  doc: 'doc'
-};
 const SPLIT_DIFFS_BY = {
   revision: 'revision',
   files: 'files'
@@ -50,7 +46,6 @@ const SPLIT_DIFFS_BY = {
 @observer
 class GenerateReportDialog extends localization.LocalizedReactComponent {
   state = {
-    reportFormat: REPORT_FORMATS.docx,
     authors: [],
     extensions: undefined,
     dateFrom: undefined,
@@ -62,7 +57,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
 
   get reportSettings () {
     const {
-      reportFormat,
       authors = [],
       extensions = '',
       dateFrom,
@@ -76,7 +70,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
       .map(ext => ext.trim())
       .filter(Boolean);
     return {
-      reportFormat,
       authors,
       extensions: [...(new Set(parsedExtensions))],
       dateFrom: dateFrom
@@ -113,7 +106,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
 
   resetSettings = () => {
     this.setState({
-      reportFormat: REPORT_FORMATS.docx,
       authors: [],
       extensions: undefined,
       dateFrom: undefined,
@@ -128,12 +120,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
     this.setState({
       authors: (value || []).slice()
     });
-  };
-
-  onChangeReportFormat = (value) => {
-    if (value && REPORT_FORMATS[value]) {
-      this.setState({reportFormat: value});
-    }
   };
 
   onDateChange = (fieldType, startOfTheDate) => (date) => {
@@ -172,45 +158,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
   onDownloadAsArchiveChange = (event) => {
     const {checked} = event.target;
     this.setState({downloadAsArchive: checked});
-  };
-
-  renderReportFormat = () => {
-    const {reportFormat} = this.state;
-    return (
-      <Row
-        className={styles.reportsRow}
-        type="flex"
-        justify="space-between"
-      >
-        <span className={styles.label}>
-          Report format:
-        </span>
-        <div
-          style={{width: '70%'}}
-          id={this.getHtmlId('format-container')}
-        >
-          <Select
-            style={{
-              width: 'calc(50% - 5px)',
-              textTransform: 'uppercase',
-              marginRight: 'auto'
-            }}
-            onChange={this.onChangeReportFormat}
-            value={reportFormat}
-          >
-            {Object.values(REPORT_FORMATS).map(format => (
-              <Select.Option
-                key={format}
-                value={format}
-                style={{textTransform: 'uppercase'}}
-              >
-                {format}
-              </Select.Option>
-            ))}
-          </Select>
-        </div>
-      </Row>
-    );
   };
 
   renderUserRow = () => {
@@ -386,8 +333,6 @@ class GenerateReportDialog extends localization.LocalizedReactComponent {
         footer={footer}
         title="Generate report"
       >
-        {this.renderReportFormat()}
-        <Divider />
         <span className={styles.filterGroupHeader}>
           Revision filters
         </span>
