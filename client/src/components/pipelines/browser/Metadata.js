@@ -1337,7 +1337,7 @@ export default class Metadata extends React.Component {
           justify="space-between"
           align="middle"
           style={{minHeight: 41, marginBottom: 6}}>
-          <Col>
+          <Col style={{width: '100%', display: 'flex', flexWrap: 'wrap'}}>
             <span className={styles.itemHeader}>
               <Breadcrumbs
                 id={parseInt(this.props.folderId)}
@@ -1357,7 +1357,7 @@ export default class Metadata extends React.Component {
                 onPressEnter={this.onSearchQueriesChanged}
                 onChange={(e) => {
                   const {filterModel} = this.state;
-                  filterModel.searchQueries = [e.target.value.trim()];
+                  filterModel.searchQueries = [e.target.value];
                   this.setState({filterModel});
                 }}
               />

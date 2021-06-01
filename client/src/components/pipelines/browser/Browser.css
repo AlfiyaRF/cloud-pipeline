@@ -124,7 +124,6 @@ tbody[class*="ant-table-tbody"] .tree-item-name {
 
 .item-header {
   padding-left: 10px;
-  flex: 1;
 }
 
 .item-header > i {
@@ -353,8 +352,14 @@ tbody[class*="ant-table-tbody"] .tree-item-name {
   margin-top: 5px;
 }
 
+.search-control {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
 .search-control > span {
-  width: 200px;
+  min-width: 200px;
   margin-left: 12px;
 }
 
