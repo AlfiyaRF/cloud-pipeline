@@ -8,7 +8,6 @@ const Option = Select.Option;
 @observer
 class FilterControl extends React.PureComponent {
   state = {
-    tags: [],
     selectedTags: [],
     popoverVisible: false
   }
@@ -18,6 +17,23 @@ class FilterControl extends React.PureComponent {
     children: PropTypes.node,
     value: PropTypes.arrayOf(PropTypes.string)
   }
+
+  get modified () {
+    const {value = []} = this.props;
+    const {selectedTags = []} = this.state;
+    const props = [...value].sort();
+    const state = [...selectedTags].sort();
+    if (props.length !== state.length) {
+      return true;
+    }
+    for (let i = 0; i < props.length; i++) {
+      if (props[i] !== state[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   componentDidMount () {
     this.updateStateFromProps();
   }
@@ -32,9 +48,6 @@ class FilterControl extends React.PureComponent {
     this.setState({selectedTags: value});
   };
 
-  getContainer = (triggernode) => {
-    return triggernode.parentNode;
-  };
   resetFilter = () => {
     this.setState({
       selectedTags: []
@@ -42,14 +55,23 @@ class FilterControl extends React.PureComponent {
     this.props.onSearch(null);
     this.handlePopoverVisibleChange(false);
   }
-  handleInputConfirm = async (value) => {
+  onChange = async (value) => {
     await this.setState({
-      selectedTags: value,
-      popoverVisible: true
+      selectedTags: value
     });
   }
   handleApplyFilter = () => {
-    this.props.onSearch(this.state.selectedTags);
+    const {
+      selectedTags = []
+    } = this.state;
+    const {
+      onSearch
+    } = this.props;
+    if (selectedTags.length === 0) {
+      onSearch && onSearch(null);
+    } else {
+      onSearch && onSearch(selectedTags);
+    }
     this.handlePopoverVisibleChange(false);
   }
   handlePopoverVisibleChange = (visible) => {
@@ -58,7 +80,8 @@ class FilterControl extends React.PureComponent {
     });
   }
   render () {
-    const {tags, selectedTags, popoverVisible} = this.state;
+    const {value = []} = this.props;
+    const {selectedTags, popoverVisible} = this.state;
     const content = (
       <div style={{width: 280, padding: '8px 0px'}}>
         <div style={{width: 280, display: 'flex', alignItems: 'center'}}>
@@ -66,18 +89,11 @@ class FilterControl extends React.PureComponent {
             value={selectedTags}
             mode="tags"
             style={{width: 280}}
-            placeholder="Type or select tags"
-            notFoundContent="Specify tags to filter"
-            onChange={this.handleInputConfirm}
-            getPopupContainer={this.getContainer}
-          >
-            {tags.map((tag, index) => (
-              <Option
-                key={tag + index}
-                value={tag}
-              >{tag}</Option>
-            ))}
-          </Select>
+            placeholder="Type filter and press enter"
+            dropdownStyle={{display: 'none'}}
+            onChange={this.onChange}
+            getPopupContainer={triggerNode => triggerNode.parentNode}
+          />
         </div>
         <div style={{
           width: '100%',
@@ -89,13 +105,17 @@ class FilterControl extends React.PureComponent {
           <Button
             type="danger"
             onClick={this.resetFilter}
-            disabled={!selectedTags.length}
-          >Reset</Button>
+            disabled={value.length === 0}
+          >
+            Reset
+          </Button>
           <Button
             type="primary"
             onClick={this.handleApplyFilter}
-            disabled={!selectedTags.length}
-          >Apply</Button>
+            disabled={!this.modified}
+          >
+            Apply
+          </Button>
         </div>
       </div>);
     return (
@@ -111,7 +131,8 @@ class FilterControl extends React.PureComponent {
               alignItems: 'center',
               cursor: 'pointer'
             }}>
-            <h4>Add new tag for search</h4>
+            <h4>Specify filter for <span style={{fontWeight: 600}}>{this.props.columnName}</span>
+            </h4>
             <Icon type="close" onClick={() => this.handlePopoverVisibleChange(false)} />
           </div>
         )}
