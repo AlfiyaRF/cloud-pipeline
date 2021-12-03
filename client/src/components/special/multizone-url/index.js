@@ -16,6 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {Icon} from 'antd';
 import Menu, {MenuItem} from 'rc-menu';
 import Dropdown from 'rc-dropdown';
@@ -114,7 +115,10 @@ export default class MultizoneUrl extends React.Component {
               onClick={(e) => e.stopPropagation()}
             >
               <Icon
-                className={styles.expander}
+                className={classNames(
+                  styles.expander,
+                  'cp-dashboard-dropdown-expander'
+                )}
                 type="down"
                 onClick={e => e.stopPropagation()}
                 style={dropDownIconStyle}

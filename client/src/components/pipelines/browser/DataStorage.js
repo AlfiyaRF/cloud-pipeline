@@ -1051,7 +1051,10 @@ export default class DataStorage extends React.Component {
         >
           <span
             onClick={() => this.openPreviewModal(selectedFile)}
-            className={styles.metadataPreviewBtn}
+            className={classNames(
+              styles.metadataPreviewBtn,
+              'cp-metadata-preview-btn'
+            )}
           >
             Click
           </span>

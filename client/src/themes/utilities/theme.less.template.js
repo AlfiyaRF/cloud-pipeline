@@ -1565,6 +1565,9 @@ export default `
   border-color: @color-blue;
   box-shadow: 0 0 1em @color-blue;
 }
+@THEME .cp-dashboard-dropdown-expander {
+  color: @primary-color;
+}
 
 @THEME .provider.aws {
   background-image: @aws-icon;
@@ -2338,6 +2341,12 @@ export default `
 @THEME .cp-metadata-dropdown-row {
   border-bottom: 1px solid @input-addon;
   background-color: @card-background-color;
+}
+@THEME .cp-metadata-preview-btn {
+  color: @primary-color;
+}
+@THEME .cp-metadata-preview-btn:hover {
+  color: @primary-hover-color;
 }
 
 @THEME .cp-node-tag {
