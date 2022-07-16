@@ -19,6 +19,7 @@ import PathNavigation from './path-navigation';
 import {SortingProperty, PropertySorters} from './sorting';
 import './file-system-tab.css';
 import './file-system-element.css';
+import {isUpdateDownloaded, installUpdate} from '../../../../scripts/updater';
 
 function SortingIcon ({sorting, property}) {
   const index = PropertySorters[property].indexOf(sorting);
@@ -376,6 +377,16 @@ function FileSystemTab (
             </div>
           </SplitPanel>
           {content}
+          {(fileSystem && fileSystem.webdavClient && isUpdateDownloaded())
+            ? <Button
+              disabled={false}
+              type="primary"
+              onClick={() => console.log(installUpdate())}
+            >
+              Install Update
+            </Button>
+            : null
+          }
         </div>
       </div>
     </div>
